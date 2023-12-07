@@ -5,6 +5,8 @@ import 'package:pills/repo/drug_repo.dart';
 import 'model/drug.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await drugRepo.init();
   runApp(const MyApp());
 }
 
@@ -45,8 +47,10 @@ class _MainPageState extends State<MainPage> {
           initialData: const {},
           stream: drugRepo.stream,
           builder: (context, snapshot) {
+            final sortedVals = snapshot.data!.values.toList();
+            sortedVals.sort((a, b) => a.id - b.id);
             return ListView(
-              children: snapshot.data!.values.map((e) => ListTile(
+              children: sortedVals.map((e) => ListTile(
                 title: Text(e.name),
                 onTap: () async {
                   final drug = await Navigator.of(context).push(DrugEditorRoute("Edit drug", drug: e));

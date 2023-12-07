@@ -1,11 +1,17 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:pills/model/drug.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final drugRepo = DrugRepo();
+const _drugPrefPrefix = "leadp.drug.";
 
+String drugKey(Drug drug) => "$_drugPrefPrefix${drug.id}";
 
 class DrugRepo{
+  late final SharedPreferences prefs;
+  bool inited = false;
   final Map<int, Drug> _drugs = {};
   int nextId = 1;
   final _controller = StreamController<Map<int, Drug>>();
@@ -15,16 +21,31 @@ class DrugRepo{
     stream = _controller.stream.asBroadcastStream();
   }
 
-  int addDrug(Drug drug){
+  Future<void> init() async {
+    if(inited){
+      return;
+    }
+    prefs = await SharedPreferences.getInstance();
+    final drugIter = prefs.getKeys().where((element) => element.startsWith(_drugPrefPrefix)).map((e) => DrugMapper.fromJson(prefs.getString(e)!)).map((e) => MapEntry(e.id, e));
+    _drugs.addEntries(drugIter);
+    nextId = _drugs.values.map((e) => e.id).reduce(max) + 1;
+    inited = true;
+    _notify();
+  }
+
+
+  Future<int> addDrug(Drug drug) async {
     drug.id = nextId++;
     _drugs[drug.id] = drug;
+    await prefs.setString(drugKey(drug), drug.toJson());
     _notify();
     return drug.id;
   }
 
-  void saveDrug(Drug drug){
+  void saveDrug(Drug drug) async {
     // TODO: actually save int to storage
     _drugs[drug.id] = drug;
+    await prefs.setString(drugKey(drug), drug.toJson());
     _notify();
   }
 

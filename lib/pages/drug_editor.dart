@@ -27,13 +27,15 @@ class DrugEditor extends StatefulWidget {
 class _DrugEditorState extends State<DrugEditor> {
   late Drug drug;
   late final TextEditingController _nameController;
+  late final TextEditingController _notesController;
   static const days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 
   @override
   void initState() {
     super.initState();
-    drug = widget.drug != null ? widget.drug!.copy() : Drug("");
+    drug = widget.drug != null ? widget.drug!.reallyCopy() : Drug();
     _nameController = TextEditingController(text: drug.name);
+    _notesController = TextEditingController(text: drug.notes);
   }
 
   @override
@@ -61,6 +63,19 @@ class _DrugEditorState extends State<DrugEditor> {
                 drug.name = t;
               },
               controller: _nameController,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: TextField(
+              decoration: const InputDecoration(
+                labelText: "Способ применения",
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (t) {
+                drug.notes = t;
+              },
+              controller: _notesController,
             ),
           ),
           Center(child: Text("Дни недели")),
