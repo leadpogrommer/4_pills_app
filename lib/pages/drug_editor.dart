@@ -65,18 +65,55 @@ class _DrugEditorState extends State<DrugEditor> {
           ),
           Center(child: Text("Дни недели")),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
-            child: ToggleButtons(
-              children: days.map((e) => Text(e)).toList(),
-              isSelected: drug.consumptionDays,
-              onPressed: (i){
-                setState(() {
-                  drug.consumptionDays[i] = !drug.consumptionDays[i];
-                });
-              },
-            )
-          ),
-          Text("Потом здесь можно будет выбрать время приема", style: TextStyle(fontSize: 33),)
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+              child: ToggleButtons(
+                children: days.map((e) => Text(e)).toList(),
+                isSelected: drug.consumptionDays,
+                onPressed: (i) {
+                  setState(() {
+                    drug.consumptionDays[i] = !drug.consumptionDays[i];
+                  });
+                },
+              )),
+          Center(child: Text("Время")),
+          Expanded(
+            child: ListView(
+              children: drug.consumptionTimes.indexed.map((pair) {
+                    final time = pair.$2;
+                    final hours = time ~/ 60;
+                    final minutes = time % 60;
+                    return ListTile(
+                      title: Text("${hours}:${minutes.toString().padLeft(2, "0")}"),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          setState(() {
+                            drug.consumptionTimes.removeAt(pair.$1);
+                          });
+                        },
+                      ),
+                    );
+                  }).toList() +
+                  [
+                    ListTile(
+                      trailing: IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: () async {
+                          final time = await showTimePicker(
+                              context: context, initialTime: TimeOfDay.now());
+                          if (time != null) {
+                            final t = time.hour * 60 + time.minute;
+                            setState(() {
+                              drug.consumptionTimes.add(t);
+                              drug.consumptionTimes.sort();
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+            ),
+          )
         ],
       ),
     );

@@ -3,21 +3,29 @@ enum NotificationType { push, call }
 class Drug {
   int id;
   String name;
+  String notes;
   NotificationType notificationType;
-  List<int> consumptionTimes;
+  late List<int> consumptionTimes;
   late List<bool> consumptionDays;
 
   Drug(
     this.name, {
+      this.notes = "",
     this.notificationType = NotificationType.push,
-    this.consumptionTimes = const [],
-    List<bool>? consumptionDays = null,
+    List<int>? consumptionTimes,
+    List<bool>? consumptionDays,
         this.id = 0,
   }){
     if(consumptionDays == null){
       this.consumptionDays = [false, false, false, false, false, false, false];
     }else{
       this.consumptionDays = consumptionDays;
+    }
+
+    if(consumptionTimes == null){
+      this.consumptionTimes = [];
+    }else{
+      this.consumptionTimes = consumptionTimes;
     }
   }
 
@@ -27,5 +35,6 @@ class Drug {
         consumptionTimes: consumptionTimes.toList(),
         consumptionDays: consumptionDays.toList(),
         id: id,
+    notes: notes,
       );
 }
