@@ -28,6 +28,7 @@ class _DrugEditorState extends State<DrugEditor> {
   late Drug drug;
   late final TextEditingController _nameController;
   late final TextEditingController _notesController;
+  late final TextEditingController _methodController;
   static const days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 
   @override
@@ -36,6 +37,7 @@ class _DrugEditorState extends State<DrugEditor> {
     drug = widget.drug != null ? widget.drug!.reallyCopy() : Drug();
     _nameController = TextEditingController(text: drug.name);
     _notesController = TextEditingController(text: drug.notes);
+    _methodController = TextEditingController();
   }
 
   @override
@@ -78,6 +80,29 @@ class _DrugEditorState extends State<DrugEditor> {
               controller: _notesController,
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: DropdownMenu<NotificationType>(
+              expandedInsets: EdgeInsets.zero,
+              initialSelection: drug.notificationType,
+              controller: _methodController,
+              // requestFocusOnTap: true,
+              label: const Text('Напоминание'),
+              onSelected: (type) {
+                setState(() {
+                  if (type != null) drug.notificationType = type;
+                });
+              },
+              dropdownMenuEntries: NotificationType.values
+                  .map(
+                    (e) => DropdownMenuEntry(
+                  value: e,
+                  label: e.name,
+                ),
+              )
+                  .toList(),
+            ),
+          ),
           Center(child: Text("Дни недели")),
           Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
@@ -89,7 +114,8 @@ class _DrugEditorState extends State<DrugEditor> {
                     drug.consumptionDays[i] = !drug.consumptionDays[i];
                   });
                 },
-              )),
+              ),),
+
           Center(child: Text("Время")),
           Expanded(
             child: ListView(
@@ -98,7 +124,8 @@ class _DrugEditorState extends State<DrugEditor> {
                     final hours = time ~/ 60;
                     final minutes = time % 60;
                     return ListTile(
-                      title: Text("${hours}:${minutes.toString().padLeft(2, "0")}"),
+                      title: Text(
+                          "${hours}:${minutes.toString().padLeft(2, "0")}"),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () {

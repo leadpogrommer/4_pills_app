@@ -3,7 +3,13 @@ import 'package:dart_mappable/dart_mappable.dart';
 part 'drug.mapper.dart';
 
 @MappableEnum()
-enum NotificationType { push, call }
+enum NotificationType {
+  push('Уведомление'), call('Звонок');
+
+  final String name;
+
+  const NotificationType(this.name);
+}
 
 @MappableClass()
 class Drug with DrugMappable {
