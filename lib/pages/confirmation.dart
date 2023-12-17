@@ -2,10 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:pills/main.dart';
+import 'package:pills/repo/consumption_repo.dart';
 import 'package:pills/repo/drug_repo.dart';
 import 'package:slide_action/slide_action.dart';
 import 'dart:math' as math;
 
+import '../model/consumtion.dart';
 import '../model/drug.dart';
 import '../util/keyguard.dart';
 
@@ -42,10 +44,11 @@ class _ConfirmationPageState extends State<ConfirmationPage>
   void initState() {
     super.initState();
 
-    drug = drugRepo.getDrug(widget.drugId)!;
+    drug = drugRepo.getItem(widget.drugId)!;
     showCallScreen = widget.isLocked;
-    if(showCallScreen){
-      FlutterRingtonePlayer.play(fromAsset: 'assets/ringtone.mp3', looping: true, volume: 1);
+    if (showCallScreen) {
+      FlutterRingtonePlayer.play(
+          fromAsset: 'assets/ringtone.mp3', looping: true, volume: 1);
     }
     _roatator =
         AnimationController(vsync: this, lowerBound: 0, upperBound: math.pi * 2)
@@ -67,7 +70,7 @@ class _ConfirmationPageState extends State<ConfirmationPage>
   }
 
   Future<void> unlock() async {
-    while(await dismissKeyguard());
+    while (await dismissKeyguard());
     setState(() {
       showCallScreen = false;
     });
@@ -113,12 +116,12 @@ class _ConfirmationPageState extends State<ConfirmationPage>
                 ),
                 child: state.isPerformingAction
                     ? const CupertinoActivityIndicator(
-                  color: Colors.white,
-                )
+                        color: Colors.white,
+                      )
                     : const Icon(
-                  Icons.chevron_right,
-                  color: Colors.white,
-                ),
+                        Icons.chevron_right,
+                        color: Colors.white,
+                      ),
               );
             },
             trackBuilder: (context, state) {
@@ -140,7 +143,7 @@ class _ConfirmationPageState extends State<ConfirmationPage>
                 ),
               );
             },
-            action: (){
+            action: () {
               print('Trying to unlock');
               unlock();
             },
@@ -152,7 +155,34 @@ class _ConfirmationPageState extends State<ConfirmationPage>
 
   Widget _buildMain(BuildContext context) {
     return Scaffold(
-      body: Text('Confirmation page'),
+      appBar: AppBar(
+        title: const Text('Пейте лекарство'),
+      ),
+      body: Column(
+        children: [
+          Text(
+            'Пришло время принять ${drug.name}',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 30),
+          ),
+          if (drug.notes.trim().isNotEmpty)
+            Text(
+              drug.notes,
+              textAlign: TextAlign.center,
+            ),
+          Expanded(child: Container()),
+          ElevatedButton(
+            onPressed: (){
+              consumptionRepo.addItem(Consumption(
+                time: DateTime.now(),
+                drug: drug,
+              ));
+              Navigator.of(context).pop();
+            },
+            child: Text('Принято'),
+          ),
+        ],
+      ),
     );
   }
 }

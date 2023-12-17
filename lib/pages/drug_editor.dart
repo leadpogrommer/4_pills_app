@@ -48,7 +48,7 @@ class _DrugEditorState extends State<DrugEditor> {
         actions: [
           ElevatedButton(
             onPressed: () => Navigator.pop(context, drug),
-            child: const Text("Done"),
+            child: const Text("Ок"),
           ),
         ],
       ),

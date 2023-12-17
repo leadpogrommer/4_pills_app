@@ -1,4 +1,7 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:pills/repo/consumption_repo.dart';
+
+import '../repo/abstract_repo.dart';
 
 part 'drug.mapper.dart';
 
@@ -12,7 +15,8 @@ enum NotificationType {
 }
 
 @MappableClass()
-class Drug with DrugMappable {
+class Drug with DrugMappable implements WithId {
+  @override
   int id;
   String name;
   String notes;
